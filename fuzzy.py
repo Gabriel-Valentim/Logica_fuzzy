@@ -29,18 +29,15 @@ Avaliacoes_Anteriores['media'] = fuzz.trimf(Avaliacoes_Anteriores.universe, [0, 
 Avaliacoes_Anteriores['alta']  = fuzz.trimf(Avaliacoes_Anteriores.universe, [5, 10, 10])
 
 # Definindo a função de pertinência para Genero_Filme_Anterior
-Genero_Filme_Anterior['acao']    = fuzz.trimf(Genero_Filme_Anterior.universe, [0, 0, 3])
-Genero_Filme_Anterior['comedia'] = fuzz.trimf(Genero_Filme_Anterior.universe, [2, 3, 4])
-Genero_Filme_Anterior['romance'] = fuzz.trimf(Genero_Filme_Anterior.universe, [4, 5, 6])
-Genero_Filme_Anterior['terror']  = fuzz.trimf(Genero_Filme_Anterior.universe, [6, 7, 8])
-Genero_Filme_Anterior['drama']   = fuzz.trimf(Genero_Filme_Anterior.universe, [7, 10, 10]) 
+Genero_Filme_Anterior['acao']    = fuzz.trimf(Genero_Filme_Anterior.universe, [0, 0, 5])
+Genero_Filme_Anterior['comedia'] = fuzz.trimf(Genero_Filme_Anterior.universe, [0, 5, 10])
+Genero_Filme_Anterior['romance'] = fuzz.trimf(Genero_Filme_Anterior.universe, [5, 10, 10])
+
 
 # Gênero preferido 
-Genero_Preferido['acao']    = fuzz.trimf(Genero_Preferido.universe, [0, 0, 3])
-Genero_Preferido['comedia'] = fuzz.trimf(Genero_Preferido.universe, [2, 3, 4])
-Genero_Preferido['romance'] = fuzz.trimf(Genero_Preferido.universe, [4, 5, 6])
-Genero_Preferido['terror']  = fuzz.trimf(Genero_Preferido.universe, [6, 7, 8])
-Genero_Preferido['drama']   = fuzz.trimf(Genero_Preferido.universe, [7, 10, 10])
+Genero_Preferido['acao']    = fuzz.trimf(Genero_Preferido.universe, [0, 0, 5])
+Genero_Preferido['comedia'] = fuzz.trimf(Genero_Preferido.universe, [0, 5, 10])
+Genero_Preferido['romance'] = fuzz.trimf(Genero_Preferido.universe, [5, 10, 10])
 
 # Tempo de visualização
 Tempo_Visualizacao['curto'] = fuzz.trimf(Tempo_Visualizacao.universe, [0, 0, 5])
@@ -56,3 +53,19 @@ Idade_Usuario['idoso']  = fuzz.trimf(Idade_Usuario.universe, [60, 100, 100])
 Recomendacao['baixa'] = fuzz.trimf(Recomendacao.universe, [0, 0, 5])
 Recomendacao['media'] = fuzz.trimf(Recomendacao.universe, [0, 5, 10])
 Recomendacao['alta']  = fuzz.trimf(Recomendacao.universe, [5, 10, 10])
+
+
+# Definindo as regras de produção
+rules = []
+for av in ['baixa', 'media', 'alta']:
+    for gf in ['acao', 'comedia', 'romance']:
+        for gp in ['acao', 'comedia', 'romance']:
+            for tv in ['curto', 'medio', 'longo']:
+                for iu in ['jovem', 'adulto', 'idoso']:
+                    if av == 'alta' and gf == gp:
+                        rules.append(ctrl.Rule(Avaliacoes_Anteriores[av] & Genero_Filme_Anterior[gf] & Genero_Preferido[gp] & Tempo_Visualizacao[tv] & Idade_Usuario[iu], Recomendacao['alta']))
+                    elif av == 'media' and gf == gp:
+                        rules.append(ctrl.Rule(Avaliacoes_Anteriores[av] & Genero_Filme_Anterior[gf] & Genero_Preferido[gp] & Tempo_Visualizacao[tv] & Idade_Usuario[iu], Recomendacao['media']))
+                    else:
+                        rules.append(ctrl.Rule(Avaliacoes_Anteriores[av] & Genero_Filme_Anterior[gf] & Genero_Preferido[gp] & Tempo_Visualizacao[tv] & Idade_Usuario[iu], Recomendacao['baixa']))
+
