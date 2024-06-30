@@ -30,3 +30,40 @@ Dia_Semana['fim_semana'] = fuzz.trimf(Dia_Semana.universe, [4, 6, 6])
 Duracao_Semaforo['curta'] = fuzz.trimf(Duracao_Semaforo.universe, [0, 0, 50])
 Duracao_Semaforo['media'] = fuzz.trimf(Duracao_Semaforo.universe, [0, 50, 100])
 Duracao_Semaforo['longa'] = fuzz.trimf(Duracao_Semaforo.universe, [50, 100, 100])
+
+# Definindo as regras
+regra1 = ctrl.Rule(Volume_Trafego['alto'] & Condicao_Estrada['ruim'] & Hora_Dia['manha'] & Dia_Semana['semana'], Duracao_Semaforo['curta'])
+regra2 = ctrl.Rule(Volume_Trafego['baixo'] & Condicao_Estrada['boa'] & Hora_Dia['madrugada'] & Dia_Semana['fim_semana'], Duracao_Semaforo['longa'])
+regra3 = ctrl.Rule(Volume_Trafego['medio'] & Condicao_Estrada['media'] & Hora_Dia['tarde'] & Dia_Semana['semana'], Duracao_Semaforo['media'])
+regra4 = ctrl.Rule(Volume_Trafego['alto'] & Hora_Dia['noite'] & Dia_Semana['fim_semana'], Duracao_Semaforo['media'])
+
+# Criando e simulando um controlador fuzzy
+sistema_controle = ctrl.ControlSystem([regra1, regra2, regra3, regra4])
+simulacao = ctrl.ControlSystemSimulation(sistema_controle)
+
+# Definindo um conjunto de casos de teste
+casos_teste = [
+    {'Volume_Trafego': 8, 'Condicao_Estrada': 9, 'Hora_Dia': 8, 'Dia_Semana': 2},
+    {'Volume_Trafego': 3, 'Condicao_Estrada': 1, 'Hora_Dia': 2, 'Dia_Semana': 5},
+    {'Volume_Trafego': 5, 'Condicao_Estrada': 5, 'Hora_Dia': 15, 'Dia_Semana': 3},
+    # Adicione mais casos de teste conforme necessário
+]
+
+# Executando os casos de teste
+for i, caso_teste in enumerate(casos_teste):
+    simulacao.input['Volume_Trafego'] = caso_teste['Volume_Trafego']
+    simulacao.input['Condicao_Estrada'] = caso_teste['Condicao_Estrada']
+    simulacao.input['Hora_Dia'] = caso_teste['Hora_Dia']
+    simulacao.input['Dia_Semana'] = caso_teste['Dia_Semana']
+
+    # Computando a duração do semáforo
+    simulacao.compute()
+
+    # Imprimindo o resultado
+    print(f"Caso de teste {i+1}: {simulacao.output['Duracao_Semaforo']}")
+
+    # Plotando a saída do sistema fuzzy
+    Duracao_Semaforo.view(simulacao)
+
+    # Exibindo o gráfico
+    plt.show()
