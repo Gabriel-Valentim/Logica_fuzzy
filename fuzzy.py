@@ -1,71 +1,32 @@
 import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
+import matplotlib.pyplot as plt
 
 # Definindo as variáveis do universo
+Volume_Trafego = ctrl.Antecedent(np.arange(0, 11, 1), 'Volume_Trafego')
+Condicao_Estrada = ctrl.Antecedent(np.arange(0, 11, 1), 'Condicao_Estrada')
+Hora_Dia = ctrl.Antecedent(np.arange(0, 24, 1), 'Hora_Dia')
+Dia_Semana = ctrl.Antecedent(np.arange(0, 7, 1), 'Dia_Semana')
+Duracao_Semaforo = ctrl.Consequent(np.arange(0, 101, 1), 'Duracao_Semaforo')
 
-# Gênero do filme anterior 
-Genero_Filme_Anterior = ctrl.Antecedent(np.arange(0, 11, 1), 'Genero_Filme_Anterior')
+# Definindo as funções de pertinência
+Volume_Trafego['baixo'] = fuzz.trimf(Volume_Trafego.universe, [0, 0, 5])
+Volume_Trafego['medio'] = fuzz.trimf(Volume_Trafego.universe, [0, 5, 10])
+Volume_Trafego['alto'] = fuzz.trimf(Volume_Trafego.universe, [5, 10, 10])
 
-# Avaliações anteriores de filmes 
-Avaliacoes_Anteriores = ctrl.Antecedent(np.arange(0, 11, 1), 'Avaliacoes_Anteriores')
+Condicao_Estrada['boa'] = fuzz.trimf(Condicao_Estrada.universe, [0, 0, 5])
+Condicao_Estrada['media'] = fuzz.trimf(Condicao_Estrada.universe, [0, 5, 10])
+Condicao_Estrada['ruim'] = fuzz.trimf(Condicao_Estrada.universe, [5, 10, 10])
 
-# Gênero preferido 
-Genero_Preferido = ctrl.Antecedent(np.arange(0, 11, 1), 'Genero_Preferido')
+Hora_Dia['madrugada'] = fuzz.trimf(Hora_Dia.universe, [0, 0, 6])
+Hora_Dia['manha'] = fuzz.trimf(Hora_Dia.universe, [6, 12, 12])
+Hora_Dia['tarde'] = fuzz.trimf(Hora_Dia.universe, [12, 18, 18])
+Hora_Dia['noite'] = fuzz.trimf(Hora_Dia.universe, [18, 24, 24])
 
-# Tempo de visualização 
-Tempo_Visualizacao = ctrl.Antecedent(np.arange(0, 11, 1), 'Tempo_Visualizacao')
+Dia_Semana['semana'] = fuzz.trimf(Dia_Semana.universe, [0, 3, 4])
+Dia_Semana['fim_semana'] = fuzz.trimf(Dia_Semana.universe, [4, 6, 6])
 
-# Idade do usuário 
-Idade_Usuario = ctrl.Antecedent(np.arange(0, 101, 1), 'Idade_Usuario')
-
-# Recomendação de filme 
-Recomendacao = ctrl.Consequent(np.arange(0, 11, 1), 'Recomendacao')
-
-# Definindo as funções de pertinência para cada variável
-# Avaliações anteriores de filmes
-Avaliacoes_Anteriores['baixa'] = fuzz.trimf(Avaliacoes_Anteriores.universe, [0, 0, 5])
-Avaliacoes_Anteriores['media'] = fuzz.trimf(Avaliacoes_Anteriores.universe, [0, 5, 10])
-Avaliacoes_Anteriores['alta']  = fuzz.trimf(Avaliacoes_Anteriores.universe, [5, 10, 10])
-
-# Definindo a função de pertinência para Genero_Filme_Anterior
-Genero_Filme_Anterior['acao']    = fuzz.trimf(Genero_Filme_Anterior.universe, [0, 0, 5])
-Genero_Filme_Anterior['comedia'] = fuzz.trimf(Genero_Filme_Anterior.universe, [0, 5, 10])
-Genero_Filme_Anterior['romance'] = fuzz.trimf(Genero_Filme_Anterior.universe, [5, 10, 10])
-
-
-# Gênero preferido 
-Genero_Preferido['acao']    = fuzz.trimf(Genero_Preferido.universe, [0, 0, 5])
-Genero_Preferido['comedia'] = fuzz.trimf(Genero_Preferido.universe, [0, 5, 10])
-Genero_Preferido['romance'] = fuzz.trimf(Genero_Preferido.universe, [5, 10, 10])
-
-# Tempo de visualização
-Tempo_Visualizacao['curto'] = fuzz.trimf(Tempo_Visualizacao.universe, [0, 0, 5])
-Tempo_Visualizacao['medio'] = fuzz.trimf(Tempo_Visualizacao.universe, [0, 5, 10])
-Tempo_Visualizacao['longo'] = fuzz.trimf(Tempo_Visualizacao.universe, [5, 10, 10])
-
-# Idade do usuário
-Idade_Usuario['jovem']  = fuzz.trimf(Idade_Usuario.universe, [0, 0, 40])
-Idade_Usuario['adulto'] = fuzz.trimf(Idade_Usuario.universe, [20, 50, 80])
-Idade_Usuario['idoso']  = fuzz.trimf(Idade_Usuario.universe, [60, 100, 100])
-
-# Recomendação
-Recomendacao['baixa'] = fuzz.trimf(Recomendacao.universe, [0, 0, 5])
-Recomendacao['media'] = fuzz.trimf(Recomendacao.universe, [0, 5, 10])
-Recomendacao['alta']  = fuzz.trimf(Recomendacao.universe, [5, 10, 10])
-
-
-# Definindo as regras de produção
-rules = []
-for av in ['baixa', 'media', 'alta']:
-    for gf in ['acao', 'comedia', 'romance']:
-        for gp in ['acao', 'comedia', 'romance']:
-            for tv in ['curto', 'medio', 'longo']:
-                for iu in ['jovem', 'adulto', 'idoso']:
-                    if av == 'alta' and gf == gp:
-                        rules.append(ctrl.Rule(Avaliacoes_Anteriores[av] & Genero_Filme_Anterior[gf] & Genero_Preferido[gp] & Tempo_Visualizacao[tv] & Idade_Usuario[iu], Recomendacao['alta']))
-                    elif av == 'media' and gf == gp:
-                        rules.append(ctrl.Rule(Avaliacoes_Anteriores[av] & Genero_Filme_Anterior[gf] & Genero_Preferido[gp] & Tempo_Visualizacao[tv] & Idade_Usuario[iu], Recomendacao['media']))
-                    else:
-                        rules.append(ctrl.Rule(Avaliacoes_Anteriores[av] & Genero_Filme_Anterior[gf] & Genero_Preferido[gp] & Tempo_Visualizacao[tv] & Idade_Usuario[iu], Recomendacao['baixa']))
-
+Duracao_Semaforo['curta'] = fuzz.trimf(Duracao_Semaforo.universe, [0, 0, 50])
+Duracao_Semaforo['media'] = fuzz.trimf(Duracao_Semaforo.universe, [0, 50, 100])
+Duracao_Semaforo['longa'] = fuzz.trimf(Duracao_Semaforo.universe, [50, 100, 100])
