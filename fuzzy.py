@@ -46,7 +46,8 @@ casos_teste = [
     {'Volume_Trafego': 8, 'Condicao_Estrada': 9, 'Hora_Dia': 8, 'Dia_Semana': 2},
     {'Volume_Trafego': 3, 'Condicao_Estrada': 1, 'Hora_Dia': 2, 'Dia_Semana': 5},
     {'Volume_Trafego': 5, 'Condicao_Estrada': 5, 'Hora_Dia': 15, 'Dia_Semana': 3},
-    # Adicione mais casos de teste conforme necessário
+    {'Volume_Trafego': 10, 'Condicao_Estrada': 1, 'Hora_Dia': 15, 'Dia_Semana': 4},
+    {'Volume_Trafego': 1, 'Condicao_Estrada': 10, 'Hora_Dia': 5, 'Dia_Semana': 2},
 ]
 
 # Executando os casos de teste
