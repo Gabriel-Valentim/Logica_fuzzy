@@ -10,7 +10,7 @@ Hora_Dia = ctrl.Antecedent(np.arange(0, 24, 1), 'Hora_Dia')
 Dia_Semana = ctrl.Antecedent(np.arange(0, 7, 1), 'Dia_Semana')
 Duracao_Semaforo = ctrl.Consequent(np.arange(0, 101, 1), 'Duracao_Semaforo')
 
-# Definindo as funções de pertinência
+# Definindo as funções de pertinência para as variáveis do universo
 Volume_Trafego['baixo'] = fuzz.trimf(Volume_Trafego.universe, [0, 0, 5])
 Volume_Trafego['medio'] = fuzz.trimf(Volume_Trafego.universe, [0, 5, 10])
 Volume_Trafego['alto'] = fuzz.trimf(Volume_Trafego.universe, [5, 10, 10])
@@ -31,15 +31,10 @@ Duracao_Semaforo['curta'] = fuzz.trimf(Duracao_Semaforo.universe, [0, 0, 50])
 Duracao_Semaforo['media'] = fuzz.trimf(Duracao_Semaforo.universe, [0, 50, 100])
 Duracao_Semaforo['longa'] = fuzz.trimf(Duracao_Semaforo.universe, [50, 100, 100])
 
-# Definindo as regras
-#regra1 = ctrl.Rule(Volume_Trafego['alto']  & Hora_Dia['manha'] & Dia_Semana['semana'], Duracao_Semaforo['curta'])
-#regra2 = ctrl.Rule(Volume_Trafego['baixo'] & Condicao_Estrada['boa'] & Hora_Dia['madrugada'] & Dia_Semana['fim_semana'], Duracao_Semaforo['longa'])
-#regra3 = ctrl.Rule(Volume_Trafego['medio'] & Condicao_Estrada['media'] & Hora_Dia['tarde'] & Dia_Semana['semana'], Duracao_Semaforo['media'])
-#regra4 = ctrl.Rule(Volume_Trafego['alto']  & Hora_Dia['noite'] & Dia_Semana['fim_semana'], Duracao_Semaforo['media'])
-#regra5 = ctrl.Rule(Volume_Trafego['alto']  & Hora_Dia['tarde'] & Dia_Semana['semana'], Duracao_Semaforo['curta'])
 
 regras = []
 
+# for responsavel pela criação de todas as regras que teremos em nosso trabalho
 for vt in ['baixo', 'medio', 'alto']:
     for ce in ['boa', 'media', 'ruim']:
         for hd in ['madrugada', 'manha', 'tarde', 'noite']:
@@ -85,9 +80,14 @@ simulacao = ctrl.ControlSystemSimulation(sistema_controle)
 
 # Definindo um conjunto de casos de teste
 casos_teste = [
-    {'Volume_Trafego': 8, 'Condicao_Estrada': 8, 'Hora_Dia': 20, 'Dia_Semana': 2},
-    {'Volume_Trafego': 2, 'Condicao_Estrada': 1, 'Hora_Dia': 2, 'Dia_Semana': 5},
-    {'Volume_Trafego': 5, 'Condicao_Estrada': 5, 'Hora_Dia': 15, 'Dia_Semana': 3},
+    {'Volume_Trafego': 8, 'Condicao_Estrada': 8, 'Hora_Dia': 20, 'Dia_Semana': 2},   # duração - Media
+    {'Volume_Trafego': 2, 'Condicao_Estrada': 7, 'Hora_Dia': 2, 'Dia_Semana': 5},    # duração - longa
+    {'Volume_Trafego': 5, 'Condicao_Estrada': 5, 'Hora_Dia': 15, 'Dia_Semana': 3},   # duração - media
+    {'Volume_Trafego': 1, 'Condicao_Estrada': 10, 'Hora_Dia': 3, 'Dia_Semana': 1},   # duração - longa
+    {'Volume_Trafego': 3, 'Condicao_Estrada': 6, 'Hora_Dia': 22, 'Dia_Semana': 6},   # duração - curta 
+    {'Volume_Trafego': 9, 'Condicao_Estrada': 3, 'Hora_Dia': 17, 'Dia_Semana': 3},   # duração - media
+    {'Volume_Trafego': 4, 'Condicao_Estrada': 5, 'Hora_Dia': 11, 'Dia_Semana': 2},   # duração - media
+    {'Volume_Trafego': 10, 'Condicao_Estrada': 10, 'Hora_Dia': 20, 'Dia_Semana': 6}, # duração - curta
 ]
 
 # Executando os casos de teste
@@ -98,13 +98,12 @@ for i, caso_teste in enumerate(casos_teste):
     simulacao.input['Dia_Semana'] = caso_teste['Dia_Semana']
 
     # Computando a duração do semáforo
-    simulacao.compute()
-
-    # Imprimindo o resultado
-    print(f"Caso de teste {i+1}: {simulacao.output['Duracao_Semaforo']}")
-
-    # Plotando a saída do sistema fuzzy
-    Duracao_Semaforo.view(simulacao)
-
-    # Exibindo o gráfico
-    plt.show()
+    try:
+        simulacao.compute()
+        print(f"Caso de teste {i+1}: {simulacao.output['Duracao_Semaforo']}")
+        # Plotando a saída do sistema fuzzy
+        Duracao_Semaforo.view(simulacao)
+        # Exibindo o gráfico
+        plt.show()
+    except ValueError as e:
+        print(f"Caso de teste {i+1} gerou um erro: {e}")
